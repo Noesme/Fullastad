@@ -1,0 +1,50 @@
+# --- Nycklar, lösenord och lokal konfiguration ---
+.env
+.env.*
+!.env.example
+config.json
+config.local.json
+*.local.json
+secrets.*
+*.secret
+*.key
+*.pem
+*.pfx
+*.p12
+*.crt
+*.cer
+*.jks
+*.keystore
+credentials*
+id_rsa*
+id_ed25519*
+
+# --- Personuppgifter och användardata ---
+# Exporter, loggar och dumpar kan innehålla e-post, namn eller registreringsnummer
+*.log
+logs/
+*.csv
+*.xlsx
+*.sqlite
+*.db
+exports/
+userdata/
+backup*/
+
+# --- Cache och temporära filer ---
+cache/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# --- Editor och operativsystem ---
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# --- Lokala Claude-inställningar ---
+.claude/settings.local.json

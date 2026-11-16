@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fullastad</title>
+  <meta name="description" content="Räkna ut hur mycket du kan lasta i bilen på gränshandeln.">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ikonbibliotek -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h14v-5l-2-5H7l-2 5v5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M5 12h14M5 17v2M19 17v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="14.5" r="1" fill="currentColor"/><circle cx="16" cy="14.5" r="1" fill="currentColor"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5H2.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15.5 4.8a3.5 3.5 0 0 1 0 6.4M18 15c2 .7 3.2 2.4 3.5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 20c.6-3.6 3.4-5.5 7-5.5s6.4 1.9 7 5.5H5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="i-cart" viewBox="0 0 24 24"><path d="M2 3h3l2.6 12.2a1 1 0 0 0 1 .8h9.6a1 1 0 0 0 1-.8L21 7H6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></symbol>
+      <symbol id="i-bag" viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 7V4h6v3M9 11h6M8 20v1.5M16 20v1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-luggage" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 6V3h4v3M10 10v7M14 10v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-weight" viewBox="0 0 24 24"><path d="M7 8h10l2 12H5L7 8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-beer" viewBox="0 0 24 24"><path d="M6 8h10v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8ZM16 10h2a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6 8a3 3 0 0 1 3-4 3 3 0 0 1 5 0 2.5 2.5 0 0 1 2 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-wine" viewBox="0 0 24 24"><path d="M7 3h10l-1 6a4 4 0 0 1-8 0L7 3ZM12 13v7M8 21h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-spirit" viewBox="0 0 24 24"><path d="M9 2h3v4l2 3v12H7V9l2-3V2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7 13h7" stroke="currentColor" stroke-width="2"/><path d="M16 12h5v8a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="i-soda" viewBox="0 0 24 24"><path d="M6 4h12M7 4l1.5 16a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1L17 4M7.5 9h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="brand">
+    <img src="logo.svg" alt="" width="112" height="78">
+    <h1>Fullastad</h1>
+  </header>
+
+  <main>
+    <!-- Din bil -->
+    <section class="card" aria-labelledby="h-car">
+      <div class="card-head"><h2 id="h-car"><svg class="ico"><use href="#i-car"/></svg>Din bil</h2></div>
+
+      <div class="selects">
+        <label class="select-field"><span class="label">Märke</span>
+          <select id="car-brand"><option value="">Välj märke</option></select></label>
+        <label class="select-field"><span class="label">Modell</span>
+          <select id="car-model" disabled><option value="">Välj modell</option></select></label>
+        <label class="select-field"><span class="label">Generation</span>
+          <select id="car-gen" disabled><option value="">Välj generation</option></select></label>
+      </div>
+
+      <p class="label">Information om bilen</p>
+      <div class="info-box">
+        <label class="info-row"><span>Fabrikat</span>
+          <input id="car-make" class="info-input" placeholder="–"></label>
+        <label class="info-row"><span>Max lastvikt</span>
+          <span class="unit-wrap"><input id="car-load" class="info-input num" inputmode="numeric" placeholder="–"> kg</span></label>
+      </div>
+      <p class="hint" id="car-hint">Typvärden för modellen – de varierar med motor och utrustning. Kontrollera max lastvikt (totalvikt − tjänstevikt) i registreringsbeviset och ändra vid behov.</p>
+    </section>
+
+    <!-- Förare och passagerare -->
+    <section class="card" aria-labelledby="h-people">
+      <div class="card-head"><h2 id="h-people"><svg class="ico"><use href="#i-users"/></svg>Förare och passagerare</h2><span class="total" id="people-total">– kg</span></div>
+      <ul class="rows" id="people"></ul>
+      <button type="button" class="btn-dashed" id="add-person"><svg class="ico-s"><use href="#i-plus"/></svg>Lägg till passagerare</button>
+    </section>
+
+    <!-- Inköpslista -->
+    <section class="card" aria-labelledby="h-shop">
+      <div class="card-head"><h2 id="h-shop"><svg class="ico"><use href="#i-cart"/></svg>Inköpslista</h2><span class="total" id="shop-total">– kg</span></div>
+
+      <p class="label">Kategorier</p>
+      <div class="chips" id="categories" role="tablist"></div>
+
+      <p class="label">Lägg till dryck</p>
+      <div class="chips" id="sizes"></div>
+      <p class="source" id="sizes-status"></p>
+
+      <p class="label">Din lista</p>
+      <ul class="rows" id="items"></ul>
+      <p class="empty" id="items-empty">Inga drycker tillagda än.</p>
+    </section>
+
+    <!-- Övrig last -->
+    <section class="card" aria-labelledby="h-other">
+      <div class="card-head"><h2 id="h-other"><svg class="ico"><use href="#i-luggage"/></svg>Övrig last</h2><span class="total" id="other-total">– kg</span></div>
+      <div class="row">
+        <span class="avatar sq"><svg><use href="#i-bag"/></svg></span>
+        <label class="row-label" for="other">Bagage, mat mm</label>
+        <span class="unit-wrap"><input id="other" class="kg-input" inputmode="decimal" placeholder="–"> kg</span>
+      </div>
+    </section>
+
+    <!-- Resultat -->
+    <section class="card" aria-labelledby="h-result">
+      <div class="card-head"><h2 id="h-result"><svg class="ico"><use href="#i-weight"/></svg>Resultat</h2></div>
+      <p class="label" id="remain-label">Kvar att lasta</p>
+      <p class="big" id="remain">– <small>kg</small></p>
+      <div class="bar" id="bar" aria-hidden="true">
+        <span class="seg s-people"></span><span class="seg s-shop"></span><span class="seg s-other"></span>
+      </div>
+      <p class="usage" id="usage"></p>
+      <ul class="summary">
+        <li><svg class="ico-s"><use href="#i-car"/></svg><span>Bilens lastförmåga</span><b id="sum-cap">– kg</b></li>
+        <li><i class="sw s-people"></i><span>Förare &amp; passagerare</span><b id="sum-people"></b></li>
+        <li><i class="sw s-shop"></i><span>Inköpslista</span><b id="sum-shop"></b></li>
+        <li><i class="sw s-other"></i><span>Övrig last</span><b id="sum-other"></b></li>
+        <li><svg class="ico-s"><use href="#i-bag"/></svg><span>Kvarvarande kapacitet</span><b id="sum-remain"></b></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Vikterna är ungefärliga och inkluderar förpackning.</p>
+    <p>Förpackningsstorlekar hämtas från bordershop.com.</p>
+    <p>Kontrollera alltid uppgifterna i bilens registreringsbevis.</p>
+    <p>Ålderskrav gäller vid köp – drick ansvarsfullt och kör aldrig påverkad.</p>
+  </footer>
+
+  <template id="tpl-person">
+    <li class="row">
+      <span class="avatar"><svg><use href="#i-user"/></svg></span>
+      <label class="row-label"></label>
+      <span class="unit-wrap"><input class="kg-input" inputmode="decimal" placeholder="–"> kg</span>
+      <button type="button" class="icon-btn del" aria-label="Ta bort"><svg><use href="#i-trash"/></svg></button>
+    </li>
+  </template>
+
+  <template id="tpl-item">
+    <li class="row item">
+      <span class="avatar sq"><svg><use href=""/></svg></span>
+      <span class="item-text"><b></b><small></small></span>
+      <span class="stepper">
+        <button type="button" class="dec" aria-label="Minska"><svg><use href="#i-minus"/></svg></button>
+        <input class="qty" inputmode="numeric" aria-label="Antal">
+        <button type="button" class="inc" aria-label="Öka"><svg><use href="#i-plus"/></svg></button>
+      </span>
+      <span class="item-kg"></span>
+      <button type="button" class="icon-btn del" aria-label="Ta bort"><svg><use href="#i-trash"/></svg></button>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
