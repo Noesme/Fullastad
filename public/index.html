@@ -41,7 +41,7 @@
   <main>
     <!-- Din bil -->
     <section class="card" aria-labelledby="h-car">
-      <div class="card-head"><h2 id="h-car"><svg class="ico"><use href="#i-car"/></svg>Din bil</h2></div>
+      <div class="card-head"><h2 id="h-car"><svg class="ico" aria-hidden="true"><use href="#i-car"/></svg>Din bil</h2></div>
 
       <div class="selects">
         <label class="select-field"><span class="label">Märke</span>
@@ -64,17 +64,17 @@
 
     <!-- Förare och passagerare -->
     <section class="card" aria-labelledby="h-people">
-      <div class="card-head"><h2 id="h-people"><svg class="ico"><use href="#i-users"/></svg>Förare och passagerare</h2><span class="total" id="people-total">– kg</span></div>
+      <div class="card-head"><h2 id="h-people"><svg class="ico" aria-hidden="true"><use href="#i-users"/></svg>Förare och passagerare</h2><span class="total" id="people-total">– kg</span></div>
       <ul class="rows" id="people"></ul>
-      <button type="button" class="btn-dashed" id="add-person"><svg class="ico-s"><use href="#i-plus"/></svg>Lägg till passagerare</button>
+      <button type="button" class="btn-dashed" id="add-person"><svg class="ico-s" aria-hidden="true"><use href="#i-plus"/></svg>Lägg till passagerare</button>
     </section>
 
     <!-- Inköpslista -->
     <section class="card" aria-labelledby="h-shop">
-      <div class="card-head"><h2 id="h-shop"><svg class="ico"><use href="#i-cart"/></svg>Inköpslista</h2><span class="total" id="shop-total">– kg</span></div>
+      <div class="card-head"><h2 id="h-shop"><svg class="ico" aria-hidden="true"><use href="#i-cart"/></svg>Inköpslista</h2><span class="total" id="shop-total">– kg</span></div>
 
-      <p class="label">Kategorier</p>
-      <div class="chips" id="categories" role="tablist"></div>
+      <p class="label" id="cat-label">Kategorier</p>
+      <div class="chips" id="categories" role="group" aria-labelledby="cat-label"></div>
 
       <p class="label">Lägg till dryck</p>
       <div class="chips" id="sizes"></div>
@@ -87,9 +87,9 @@
 
     <!-- Övrig last -->
     <section class="card" aria-labelledby="h-other">
-      <div class="card-head"><h2 id="h-other"><svg class="ico"><use href="#i-luggage"/></svg>Övrig last</h2><span class="total" id="other-total">– kg</span></div>
+      <div class="card-head"><h2 id="h-other"><svg class="ico" aria-hidden="true"><use href="#i-luggage"/></svg>Övrig last</h2><span class="total" id="other-total">– kg</span></div>
       <div class="row">
-        <span class="avatar sq"><svg><use href="#i-bag"/></svg></span>
+        <span class="avatar sq"><svg aria-hidden="true"><use href="#i-bag"/></svg></span>
         <label class="row-label" for="other">Bagage, mat mm</label>
         <span class="unit-wrap"><input id="other" class="kg-input" inputmode="decimal" placeholder="–"> kg</span>
       </div>
@@ -97,7 +97,7 @@
 
     <!-- Resultat -->
     <section class="card" aria-labelledby="h-result">
-      <div class="card-head"><h2 id="h-result"><svg class="ico"><use href="#i-weight"/></svg>Resultat</h2></div>
+      <div class="card-head"><h2 id="h-result"><svg class="ico" aria-hidden="true"><use href="#i-weight"/></svg>Resultat</h2></div>
       <p class="label" id="remain-label">Kvar att lasta</p>
       <p class="big" id="remain">– <small>kg</small></p>
       <div class="bar" id="bar" aria-hidden="true">
@@ -105,11 +105,11 @@
       </div>
       <p class="usage" id="usage"></p>
       <ul class="summary">
-        <li><svg class="ico-s"><use href="#i-car"/></svg><span>Bilens lastförmåga</span><b id="sum-cap">– kg</b></li>
+        <li><svg class="ico-s" aria-hidden="true"><use href="#i-car"/></svg><span>Bilens lastförmåga</span><b id="sum-cap">– kg</b></li>
         <li><i class="sw s-people"></i><span>Förare &amp; passagerare</span><b id="sum-people"></b></li>
         <li><i class="sw s-shop"></i><span>Inköpslista</span><b id="sum-shop"></b></li>
         <li><i class="sw s-other"></i><span>Övrig last</span><b id="sum-other"></b></li>
-        <li><svg class="ico-s"><use href="#i-bag"/></svg><span>Kvarvarande kapacitet</span><b id="sum-remain"></b></li>
+        <li><svg class="ico-s" aria-hidden="true"><use href="#i-bag"/></svg><span>Kvarvarande kapacitet</span><b id="sum-remain"></b></li>
       </ul>
     </section>
   </main>
@@ -123,24 +123,24 @@
 
   <template id="tpl-person">
     <li class="row">
-      <span class="avatar"><svg><use href="#i-user"/></svg></span>
+      <span class="avatar"><svg aria-hidden="true"><use href="#i-user"/></svg></span>
       <label class="row-label"></label>
       <span class="unit-wrap"><input class="kg-input" inputmode="decimal" placeholder="–"> kg</span>
-      <button type="button" class="icon-btn del" aria-label="Ta bort"><svg><use href="#i-trash"/></svg></button>
+      <button type="button" class="icon-btn del" aria-label="Ta bort"><svg aria-hidden="true"><use href="#i-trash"/></svg></button>
     </li>
   </template>
 
   <template id="tpl-item">
     <li class="row item">
-      <span class="avatar sq"><svg><use href=""/></svg></span>
+      <span class="avatar sq"><svg aria-hidden="true"><use href=""/></svg></span>
       <span class="item-text"><b></b><small></small></span>
       <span class="stepper">
-        <button type="button" class="dec" aria-label="Minska"><svg><use href="#i-minus"/></svg></button>
+        <button type="button" class="dec" aria-label="Minska"><svg aria-hidden="true"><use href="#i-minus"/></svg></button>
         <input class="qty" inputmode="numeric" aria-label="Antal">
-        <button type="button" class="inc" aria-label="Öka"><svg><use href="#i-plus"/></svg></button>
+        <button type="button" class="inc" aria-label="Öka"><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
       </span>
       <span class="item-kg"></span>
-      <button type="button" class="icon-btn del" aria-label="Ta bort"><svg><use href="#i-trash"/></svg></button>
+      <button type="button" class="icon-btn del" aria-label="Ta bort"><svg aria-hidden="true"><use href="#i-trash"/></svg></button>
     </li>
   </template>
 

@@ -234,10 +234,9 @@ function renderCategories() {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'chip';
-    b.setAttribute('role', 'tab');
-    b.setAttribute('aria-selected', String(c.key === state.category));
+    b.setAttribute('aria-pressed', String(c.key === state.category));
     b.dataset.cat = c.key;
-    b.innerHTML = `<svg><use href="#${c.icon}"/></svg>${c.label}`;
+    b.innerHTML = `<svg aria-hidden="true"><use href="#${c.icon}"/></svg>${c.label}`;
     return b;
   }));
 }
@@ -339,7 +338,7 @@ function renderSizes() {
       const n = g.products.length;
       b.title = `≈ ${fmtKg(g.kg)} per förpackning · ${n} ${n === 1 ? 'produkt' : 'produkter'} hos Bordershop\n${examples}`;
       b.setAttribute('aria-label', `Lägg till ${g.label}, cirka ${fmtKg(g.kg)}`);
-      b.innerHTML = `<span></span><span class="plus"><svg><use href="#i-plus"/></svg></span>`;
+      b.innerHTML = `<span></span><span class="plus"><svg aria-hidden="true"><use href="#i-plus"/></svg></span>`;
       b.firstChild.textContent = g.label;
       return b;
     });
@@ -356,7 +355,7 @@ function renderSizes() {
 
   const label = CATEGORIES.find((c) => c.key === cat).label;
   if (!d || (d.loading && !d.analysed)) sizesStatus.textContent = `Hämtar storlekar för ${label} från bordershop.com…`;
-  else if (d.error && !groups.length) sizesStatus.innerHTML = `Kunde inte hämta från bordershop.com (${d.error}). <a href="#" data-retry>Försök igen</a>`;
+  else if (d.error && !groups.length) sizesStatus.innerHTML = `Kunde inte hämta från bordershop.com (${d.error}). <button type="button" class="link-btn" data-retry>Försök igen</button>`;
   else sizesStatus.textContent = `${d.loading ? 'Hämtar… ' : ''}${Math.min(d.analysed, d.total)} av ${d.total} produkter från bordershop.com analyserade · vikter är uppskattade`;
 }
 
