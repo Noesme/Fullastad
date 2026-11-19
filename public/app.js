@@ -157,8 +157,8 @@ brandSel.addEventListener('change', () => {
   state.carModel = '';
   state.carId = '';
   if (!state.carBrand) state.car = { make: '', maxLoad: '' };
+  // Flytta inte fokus här: med piltangenterna ändras värdet för varje tryck (WCAG 3.2.2)
   save(); renderCar(); update();
-  if (state.carBrand) modelSel.focus();
 });
 
 modelSel.addEventListener('change', () => {
@@ -167,7 +167,6 @@ modelSel.addEventListener('change', () => {
   save(); renderGens();
   // Bara en generation → välj den direkt
   if (genSel.options.length === 2) { genSel.selectedIndex = 1; genSel.dispatchEvent(new Event('change')); }
-  else if (state.carModel) genSel.focus();
 });
 
 genSel.addEventListener('change', () => {
@@ -191,17 +190,26 @@ for (const [el, key] of [[carMake, 'make'], [carLoad, 'maxLoad']]) {
 const peopleEl = $('#people'), addPersonBtn = $('#add-person');
 
 function renderPeople() {
+  let n = 0;
   peopleEl.replaceChildren(...state.people.map((p) => {
     const li = $('#tpl-person').content.firstElementChild.cloneNode(true);
     const input = $('input', li);
+    const label = $('.row-label', li);
     const id = `p-${p.id}`;
     li.dataset.id = p.id;
     input.id = id;
     input.value = p.kg;
-    $('.row-label', li).textContent = p.role === 'driver' ? 'Förare' : 'Passagerare';
-    $('.row-label', li).htmlFor = id;
-    if (p.role === 'driver') $('.del', li).hidden = true;
-    $('.del', li).setAttribute('aria-label', 'Ta bort passagerare');
+    label.htmlFor = id;
+    if (p.role === 'driver') {
+      label.textContent = 'Förare';
+      $('.del', li).hidden = true;
+    } else {
+      // Synligt "Passagerare", men skärmläsare hör "Passagerare 2" så raderna går att skilja åt
+      n++;
+      label.textContent = 'Passagerare';
+      label.append(Object.assign(document.createElement('span'), { className: 'sr-only', textContent: ` ${n}` }));
+      $('.del', li).setAttribute('aria-label', `Ta bort passagerare ${n}`);
+    }
     return li;
   }));
 }
@@ -213,8 +221,14 @@ peopleEl.addEventListener('input', (e) => {
 peopleEl.addEventListener('click', (e) => {
   if (!e.target.closest('.del')) return;
   const id = e.target.closest('li').dataset.id;
+  const index = state.people.findIndex((x) => x.id === id);
   state.people = state.people.filter((x) => x.id !== id);
   save(); renderPeople(); update();
+  // Lämna inte fokus på en knapp som inte finns längre (WCAG 2.4.3):
+  // nästa passagerares ta bort-knapp, annars föregående, annars "Lägg till passagerare"
+  const dels = [...peopleEl.querySelectorAll('.del:not([hidden])')];
+  (dels[index - 1] || dels[dels.length - 1] || addPersonBtn).focus();
+  announce(`Passagerare borttagen. ${resultText}`);
 });
 addPersonBtn.addEventListener('click', () => {
   state.people.push({ id: uid(), role: 'passenger', kg: '' });
@@ -245,7 +259,11 @@ catEl.addEventListener('click', (e) => {
   const b = e.target.closest('[data-cat]');
   if (!b) return;
   state.category = b.dataset.cat; showAllSizes = false; save();
-  renderCategories(); renderSizes(); loadSizes(state.category);
+  renderCategories(); renderSizes();
+  // Knapparna ritas om – ge fokus tillbaka till den valda kategorin
+  $(`[data-cat="${state.category}"]`, catEl).focus();
+  announceSizes = true;
+  loadSizes(state.category);
 });
 
 function addGroupProduct(cat, product) {
@@ -308,7 +326,14 @@ async function loadSizes(cat) {
     d.error = err.message;
   } finally {
     d.loading = false;
-    if (cat === state.category) renderSizes();
+    if (cat === state.category) {
+      renderSizes();
+      // Läs bara upp när användaren själv har valt kategori, inte vid sidstart
+      const label = CATEGORIES.find((c) => c.key === cat).label;
+      if (d.error) announce(`Kunde inte hämta storlekar för ${label}.`);
+      else if (announceSizes) announce(`${d.groups.size} storlekar för ${label} hämtade.`);
+      announceSizes = false;
+    }
   }
 }
 
@@ -321,6 +346,9 @@ function renderSizes() {
   const cat = state.category;
   const d = sizeData[cat];
   const groups = sortedGroups(cat);
+  // Listan ritas om medan storlekar laddas – kom ihåg vilken knapp som hade fokus (WCAG 2.4.3)
+  const focused = sizesEl.contains(document.activeElement) ? document.activeElement : null;
+  const focusKey = focused?.dataset.more ? 'more' : focused?.dataset.key;
 
   if (!groups.length) {
     const n = d?.error ? 0 : 4;
@@ -347,10 +375,15 @@ function renderSizes() {
       more.type = 'button';
       more.className = 'size-chip more';
       more.dataset.more = '1';
+      more.setAttribute('aria-expanded', String(showAllSizes));
       more.textContent = showAllSizes ? 'Visa färre' : `Visa alla (${groups.length})`;
       nodes.push(more);
     }
     sizesEl.replaceChildren(...nodes);
+    if (focusKey) {
+      const target = focusKey === 'more' ? $('[data-more]', sizesEl) : $(`[data-key="${CSS.escape(focusKey)}"]`, sizesEl);
+      (target || $('button', sizesEl))?.focus();
+    }
   }
 
   const label = CATEGORIES.find((c) => c.key === cat).label;
@@ -375,6 +408,8 @@ sizesEl.addEventListener('click', (e) => {
   if (existing) existing.qty++;
   else state.items.push({ id: uid(), key: g.key, cat: g.cat, label: g.label, unitKg: Math.round(g.kg * 1000) / 1000, qty: 1 });
   save(); renderItems(); update();
+  const qty = (existing || state.items[state.items.length - 1]).qty;
+  announce(`${g.label} tillagd, ${qty} st. ${resultText}`);
 });
 
 function renderItems() {
@@ -385,11 +420,14 @@ function renderItems() {
     li.dataset.id = it.id;
     $('.avatar use', li).setAttribute('href', `#${c.icon}`);
     $('.item-text b', li).textContent = it.label;
-    $('.item-text small', li).textContent = c.label;
+    // Vikten per förpackning visas som text, inte bara i en tooltip som kräver mus
+    $('.item-text small', li).textContent = `${c.label} · ≈ ${fmtKg(it.unitKg)}/st`;
     $('.qty', li).value = it.qty;
     $('.qty', li).setAttribute('aria-label', `Antal ${it.label}`);
+    $('.dec', li).setAttribute('aria-label', `Minska antal ${it.label}`);
+    $('.inc', li).setAttribute('aria-label', `Öka antal ${it.label}`);
+    $('.del', li).setAttribute('aria-label', `Ta bort ${it.label}`);
     $('.item-kg', li).textContent = fmtKg(it.qty * it.unitKg);
-    li.title = `≈ ${fmtKg(it.unitKg)} per förpackning`;
     return li;
   }));
 }
@@ -398,11 +436,23 @@ itemsEl.addEventListener('click', (e) => {
   const li = e.target.closest('li');
   if (!li) return;
   const it = state.items.find((x) => x.id === li.dataset.id);
-  if (e.target.closest('.inc')) it.qty++;
-  else if (e.target.closest('.dec')) it.qty = Math.max(1, it.qty - 1);
-  else if (e.target.closest('.del')) state.items = state.items.filter((x) => x !== it);
-  else return;
+  const btn = e.target.closest('.inc, .dec, .del');
+  if (!btn) return;
+  const index = state.items.indexOf(it);
+  let msg;
+  if (btn.classList.contains('inc')) { it.qty++; msg = `${it.label}: ${it.qty} st.`; }
+  else if (btn.classList.contains('dec')) { it.qty = Math.max(1, it.qty - 1); msg = `${it.label}: ${it.qty} st.`; }
+  else { state.items = state.items.filter((x) => x !== it); msg = `${it.label} borttagen.`; }
   save(); renderItems(); update();
+  // Ge fokus tillbaka till samma knapp på samma rad. Om raden togs bort:
+  // nästa rads ta bort-knapp, annars föregående, annars texten "Inga drycker tillagda än" (WCAG 2.4.3)
+  const sameRow = $(`li[data-id="${it.id}"]`, itemsEl);
+  const rows = [...itemsEl.children];
+  const cls = ['inc', 'dec', 'del'].find((c) => btn.classList.contains(c));
+  const neighbour = rows[index] || rows[index - 1];
+  const target = sameRow ? $(`.${cls}`, sameRow) : neighbour && $('.del', neighbour);
+  (target || $('#items-empty')).focus();
+  announce(`${msg} ${resultText}`);
 });
 itemsEl.addEventListener('input', (e) => {
   if (!e.target.classList.contains('qty')) return;
@@ -413,13 +463,36 @@ itemsEl.addEventListener('input', (e) => {
   save(); update();
 });
 itemsEl.addEventListener('change', (e) => {
-  if (e.target.classList.contains('qty')) renderItems();
+  // Rita inte om hela listan här: change körs när fältet tappar fokus, och då skulle
+  // knappen man just tabbat till försvinna. Rätta bara värdet i fältet.
+  if (!e.target.classList.contains('qty')) return;
+  const it = state.items.find((x) => x.id === e.target.closest('li').dataset.id);
+  e.target.value = it.qty;
 });
 
 /* ---------- Övrig last ---------- */
 
 const otherInput = $('#other');
 otherInput.addEventListener('input', () => { state.other = otherInput.value; save(); update(); });
+
+/* ---------- Uppläsning för skärmläsare (WCAG 4.1.3) ---------- */
+
+const announcer = $('#announcer');
+let announceTimer;
+let announceSizes = false;   // läs upp hämtade storlekar bara efter att användaren valt kategori
+let resultText = '';         // senaste resultatet i textform, t.ex. "Kvar att lasta: 420 kg."
+let ready = false;           // inga uppläsningar medan sidan startar
+
+// Läser upp msg i den dolda live-regionen. Med delay väntar den tills användaren slutat skriva.
+function announce(msg, delay = 0) {
+  if (!ready) return;
+  clearTimeout(announceTimer);
+  announceTimer = setTimeout(() => {
+    announcer.textContent = '';
+    // Töm först så att samma text läses upp igen om den upprepas
+    setTimeout(() => { announcer.textContent = msg; }, 50);
+  }, delay);
+}
 
 /* ---------- Resultat ---------- */
 
@@ -463,6 +536,12 @@ function update() {
   $('#sum-other').textContent = minusOrDash(otherKg);
   $('#sum-remain').textContent = hasCap ? fmtKg(remain) : '– kg';
   $('#sum-remain').style.color = hasCap && remain < 0 ? 'var(--bad)' : '';
+
+  const amount = fmtKg(Math.abs(remain));
+  resultText = !hasCap ? 'Välj bil för att se hur mycket du kan lasta.'
+    : remain < 0 ? `Varning: överlastad med ${amount}.`
+    : `Kvar att lasta: ${amount}.`;
+  announce(resultText, 1000);
 }
 
 /* ---------- Start ---------- */
@@ -474,6 +553,7 @@ renderItems();
 otherInput.value = state.other;
 renderSizes();
 update();
+ready = true;
 
 (async () => {
   await loadSizes(state.category);

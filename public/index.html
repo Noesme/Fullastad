@@ -82,7 +82,7 @@
 
       <p class="label">Din lista</p>
       <ul class="rows" id="items"></ul>
-      <p class="empty" id="items-empty">Inga drycker tillagda än.</p>
+      <p class="empty" id="items-empty" tabindex="-1">Inga drycker tillagda än.</p>
     </section>
 
     <!-- Övrig last -->
@@ -112,6 +112,9 @@
         <li><svg class="ico-s" aria-hidden="true"><use href="#i-bag"/></svg><span>Kvarvarande kapacitet</span><b id="sum-remain"></b></li>
       </ul>
     </section>
+
+    <!-- Dold region där skärmläsare får höra resultat och ändringar (fylls av app.js) -->
+    <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
   </main>
 
   <footer>
