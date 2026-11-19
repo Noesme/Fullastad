@@ -104,8 +104,7 @@ const save = () => store.set(STORE_KEY, state);
 /* ---------- Din bil ---------- */
 
 const brandSel = $('#car-brand'), modelSel = $('#car-model'), genSel = $('#car-gen');
-const carMake = $('#car-make'), carLoad = $('#car-load'), carHint = $('#car-hint');
-const defaultHint = carHint.textContent;
+const carMake = $('#car-make'), carLoad = $('#car-load');
 let carList = [];
 const carId = (c) => `${c.make}|${c.model}|${c.gen}|${c.years}`;
 const option = (value, text) => Object.assign(document.createElement('option'), { value, textContent: text });
@@ -125,12 +124,6 @@ function renderGens() {
   genSel.replaceChildren(option('', 'Välj generation'), ...gens.map((c) => option(carId(c), `${c.gen ? `${c.gen} ` : ''}(${c.years})`)));
   genSel.disabled = !state.carModel;
   genSel.value = gens.some((c) => carId(c) === state.carId) ? state.carId : '';
-  const car = gens.find((c) => carId(c) === genSel.value);
-  const check = 'Kontrollera totalvikt − tjänstevikt i registreringsbeviset och ändra vid behov.';
-  carHint.textContent = !car ? defaultHint
-    : car.est ? `Uppskattad max lastvikt: auto-data.net saknar totalvikt för den här bilen, så värdet bygger på tjänstevikten och vad lika tunga bilar får lasta. ${check}`
-    : car.min !== car.max ? `Max lastvikt varierar ${car.min}–${car.max} kg beroende på motor och utrustning (källa: auto-data.net). ${check}`
-    : `Max lastvikt enligt auto-data.net. ${check}`;
 }
 
 function renderCar() {
